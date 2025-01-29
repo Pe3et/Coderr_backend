@@ -19,10 +19,10 @@ class OfferDetails(models.Model):
     )
 
     title = models.CharField(max_length=200)
-    revisions = models.IntegerField(default=0)
-    delivery_time_in_days = models.IntegerField(default=1)
+    revisions = models.IntegerField(default=0, min_value=-1)
+    delivery_time_in_days = models.PositiveIntegerField(default=1)
     price = models.DecimalField(decimal_places=2)
-    features = models.ManyToManyField(Feature, related_name='offers')
+    features = models.ManyToManyField(Feature, related_name='offers', blank=False)
     offer_type = models.CharField(max_length=20, choices=OFFER_TYPES)
     offer = models.ForeignKey(Offer, on_delete=models.CASCADE, related_name='details')
 

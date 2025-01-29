@@ -1,10 +1,12 @@
-from django.urls import path
+from django.urls import include, path
 from rest_framework import routers
+
+from offers_and_orders.api.views import OfferViewSet
 
 
 router = routers.SimpleRouter()
-
+router.register(r'offers', OfferViewSet)
 
 urlpatterns = [
-    # path('login/', LoginView.as_view()),
+    path('', include(router.urls)),
 ]
