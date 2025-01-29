@@ -11,7 +11,7 @@ class Feature(models.Model):
     name = models.CharField(max_length=200)
 
 
-class OfferDetails(models.Model):
+class OfferDetail(models.Model):
     OFFER_TYPES = (
         ('basic', 'BASIC'),
         ('standard', 'Standard'),
