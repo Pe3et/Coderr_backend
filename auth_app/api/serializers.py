@@ -23,15 +23,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'password': {'write_only': True}
         }
-
-    """
-    Validates if the repeated password input is correct.
-    """
-    def validate(self, data):
-        if data['password'] != data['repeated_password']:
-            raise serializers.ValidationError(
-                ['Das Passwort ist nicht gleich mit dem wiederholten Passwort'])
-        return data
     
     """
     Validates if the email isn't already registered or wrong format with custom error message.
@@ -54,6 +45,15 @@ class RegistrationSerializer(serializers.ModelSerializer):
         if User.objects.filter(username__iexact=value).exists():
             raise serializers.ValidationError(['Dieser Benutzername ist bereits vergeben.'])
         return value
+    
+    """
+    Validates if the repeated password input is correct.
+    """
+    def validate_password(self, value):
+        if value != self.initial_data['repeated_password']:
+            raise serializers.ValidationError(
+                ['Das Passwort ist nicht gleich mit dem wiederholten Passwort.'])
+        return value
 
     """
     Creates the user and also it's UserProfile with customer or business type.
@@ -63,6 +63,5 @@ class RegistrationSerializer(serializers.ModelSerializer):
         validated_data.pop('repeated_password')
         user = User.objects.create_user(**validated_data)
         UserProfile.objects.create(user=user, type=profile_type)
-        
+
         return user
-    
