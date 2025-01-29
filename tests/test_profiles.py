@@ -22,6 +22,7 @@ class TestRegistration(APITestCase):
         correct_business_data = self.correct_customer_data
         correct_business_data['type'] = 'business'
         correct_business_data['username'] = 'testbusiness'
+        correct_business_data['email'] = 'testbusiness@example.com'
         business_response = self.client.post(self.url, correct_business_data)
         self.assertEqual(business_response.status_code, 201)
 
@@ -32,10 +33,7 @@ class TestRegistration(APITestCase):
         response = self.client.post(self.url, self.correct_customer_data)
         self.assertEqual(response.status_code, 201)
         response = self.client.post(self.url, self.correct_customer_data)
-        print(response.data)
         self.assertEqual(response.status_code, 400)
-
-        # Check the correct formatting of the error message
 
     """
     Tests the expected behaviour of trying to register with incorrect data.

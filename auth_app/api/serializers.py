@@ -53,6 +53,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     def validate_username(self, value):
         if User.objects.filter(username__iexact=value).exists():
             raise serializers.ValidationError(['Dieser Benutzername ist bereits vergeben.'])
+        return value
 
     """
     Creates the user and also it's UserProfile with customer or business type.
