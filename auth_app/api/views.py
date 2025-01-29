@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import api_view
@@ -51,6 +51,6 @@ class RegistrationView(APIView):
                 'username': saved_account.username,
                 'user_id': saved_account.id
             }
+            return Response(data, status=status.HTTP_201_CREATED)
         else:
             data = serializer.errors
-        return Response(data)

@@ -7,18 +7,7 @@ from offers_and_orders.api.models import Offer
 
 
 class TestOffers(APITestCase):
-
-    def setUp(self):
-        self.user = User.objects.create_user(
-            username='testuser',
-            email='testuser@example.com',
-            password='password'
-        )
-        self.client.force_authenticate(user=self.user)
-
-    def test_post_offer(self):
-        url = reverse('offers-list')
-        data = {
+    offer_data = {
             "title": "Grafikdesign-Paket",
             "image": None,
             "description": "Ein umfassendes Grafikdesign-Paket für Unternehmen.",
@@ -49,5 +38,23 @@ class TestOffers(APITestCase):
                 }
             ]
         }
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='testuser@example.com',
+            password='password'
+        )
+
+    def test_unauth_post_offer(self):
+        url = reverse('offers-list')
+        data = self.offer_data
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_auth_post_offer(self):
+        self.client.force_authenticate(user=self.user)
+        url = reverse('offers-list')
+        data = self.offer_data
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
