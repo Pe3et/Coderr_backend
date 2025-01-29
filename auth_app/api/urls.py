@@ -1,6 +1,6 @@
 from django.urls import path
 
-from auth_app.api.views import LoginView, RegistrationView, loginView
+from auth_app.api.views import LoginView, RegistrationView
 
 
 urlpatterns = [

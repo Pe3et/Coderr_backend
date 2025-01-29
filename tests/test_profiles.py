@@ -32,10 +32,10 @@ class TestRegistration(APITestCase):
         response = self.client.post(self.url, self.correct_customer_data)
         self.assertEqual(response.status_code, 201)
         response = self.client.post(self.url, self.correct_customer_data)
-        self.assertEqual(response.status_code, 400)
-        
-        # Check the correct formatting of the error message
         print(response.data)
+        self.assertEqual(response.status_code, 400)
+
+        # Check the correct formatting of the error message
 
     """
     Tests the expected behaviour of trying to register with incorrect data.
