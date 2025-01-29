@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'django_filters',
     'rest_framework',
     'rest_framework.authtoken',
-    'auth_app'
+    'auth_app',
+    'offers_and_orders'
 ]
 
 MIDDLEWARE = [
