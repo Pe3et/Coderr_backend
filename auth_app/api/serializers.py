@@ -26,8 +26,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'password': 'Passwords do not match'})
         return data
 
-
-
     def create(self, validated_data):
         profile_type = validated_data.pop('type')
         validated_data.pop('repeated_password')
