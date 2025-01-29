@@ -4,6 +4,6 @@ from auth_app.api.views import LoginView, RegistrationView, loginView
 
 
 urlpatterns = [
-    path('login/', LoginView.as_view()),
-    path('registration/', RegistrationView.as_view()),
+    path('login/', LoginView.as_view(), name='login'),
+    path('registration/', RegistrationView.as_view(), name='register'),
 ]

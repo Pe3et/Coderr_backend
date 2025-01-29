@@ -5,7 +5,7 @@ from offers_and_orders.api.views import OfferViewSet
 
 
 router = routers.SimpleRouter()
-router.register(r'offers', OfferViewSet)
+router.register(r'offers', OfferViewSet, basename='offers')
 
 urlpatterns = [
     path('', include(router.urls)),
