@@ -18,8 +18,10 @@ from django.contrib import admin
 from django.urls import include, path
 
 import auth_app.api.urls
+import offers_and_orders.api.urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(auth_app.api.urls)),
+    path('api/', include(offers_and_orders.api.urls)),
 ]
