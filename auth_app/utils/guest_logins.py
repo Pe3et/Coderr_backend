@@ -7,7 +7,6 @@ Checks if the guest logins already exist in the Database and calls creation of t
 """
 def check_guest_logins():
     if not User.objects.filter(username='andrey').exists():
-        print('GO AGAIN')
         create_customer_guest_account()
     if not User.objects.filter(username='kevin').exists():
         create_business_guest_account()
