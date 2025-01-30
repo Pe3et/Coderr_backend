@@ -17,7 +17,6 @@ class TestLogin(APITestCase):
     """
     Test if login is working properly.
     """
-
     def test_correct_login(self):
         response = self.client.post(self.url, {
             'username': 'testuser',
@@ -40,4 +39,61 @@ class TestLogin(APITestCase):
             'password': 'wrongpassword',
         })
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data, {'non_field_errors:': ['Falsche Anmeldedaten.']})
+        self.assertEqual(
+            response.data, {'non_field_errors:': ['Falsche Anmeldedaten.']})
+
+    """
+    Test Guest logins.
+    """
+    def test_guest_logins(self):
+        customer_guest = {
+            'username': 'andrey',
+            'password': 'asdasd'
+        }
+        business_guest = {
+            'username': 'kevin',
+            'password': 'asdasd24'
+        }
+
+        response = self.client.post(self.url, customer_guest)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {
+            'token': Token.objects.get(user=User.objects.get(username='andrey')).key,
+            'username': 'andrey',
+            'email': 'testcustomer@mail.de',
+            'user_id': User.objects.get(username='andrey').id
+        })
+
+        response = self.client.post(self.url, business_guest)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, {
+            'token': Token.objects.get(user=User.objects.get(username='kevin')).key,
+            'username': 'kevin',
+            'email': 'testbusiness@mail.de',
+            'user_id': User.objects.get(username='kevin').id
+        })
+
+    """
+    Tests any other request methods than POST.
+    """
+    def test_other_request_methods(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 405)
+
+        response = self.client.put(self.url, {
+            'username': 'testuser',
+            'password': 'testpassword',
+        })
+        self.assertEqual(response.status_code, 405)
+
+        response = self.client.patch(self.url, {
+            'username': 'testuser',
+            'password': 'testpassword',
+        })
+        self.assertEqual(response.status_code, 405)
+
+        response = self.client.delete(self.url, {
+            'username': 'testuser',
+            'password': 'testpassword',
+        })
+        self.assertEqual(response.status_code, 405)

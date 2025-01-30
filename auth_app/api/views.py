@@ -6,12 +6,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from auth_app.api.serializers import RegistrationSerializer
+from auth_app.utils import guest_logins
 
 
 class LoginView(ObtainAuthToken):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        guest_logins.check_guest_logins()
         serializer = self.serializer_class(data=request.data)
         data = {}
         if serializer.is_valid():
