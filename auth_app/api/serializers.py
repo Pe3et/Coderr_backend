@@ -8,11 +8,11 @@ from auth_app.api.models import UserProfile
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['type']
+        exclude = ['id']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
-    
+
     repeated_password = serializers.CharField(write_only=True)
     type = serializers.ChoiceField(choices=UserProfile.TYPE_CHOICES, write_only=True)
     email = serializers.CharField()

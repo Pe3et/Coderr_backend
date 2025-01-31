@@ -1,11 +1,14 @@
+from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from auth_app.api.serializers import RegistrationSerializer
+from auth_app.api.models import UserProfile
+from auth_app.api.serializers import RegistrationSerializer, UserProfileSerializer
 from auth_app.utils import guest_logins
 
 
@@ -49,3 +52,22 @@ class RegistrationView(APIView):
         else:
             data = serializer.errors
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PATCH'])
+def single_profile_view(request, pk):
+    pass
+    if request.method == 'GET':
+        user = User.objects.get(pk=request.user.id)
+        profile = UserProfile.objects.get(user=user)
+        if profile:
+            serializer = UserProfileSerializer(profile)
+            data = serializer.data
+            data['username'] = user.username
+            data['first_name'] = user.first_name
+            data['last_name'] = user.last_name
+            data['email'] = user.email
+            data['created_at'] = user.date_joined
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            return Response({'non_field_errors': 'Profil nicht gefunden'}, status=status.HTTP_404_NOT_FOUND)

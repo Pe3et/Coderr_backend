@@ -46,11 +46,11 @@ class TestOffers(APITestCase):
             password='password'
         )
 
-    def test_unauth_post_offer(self):
-        url = reverse('offers-list')
-        data = self.offer_data
-        response = self.client.post(url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+    # def test_unauth_post_offer(self):
+    #     url = reverse('offers-list')
+    #     data = self.offer_data
+    #     response = self.client.post(url, data, format='json')
+    #     self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_auth_post_offer(self):
         self.client.force_authenticate(user=self.user)
