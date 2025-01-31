@@ -2,7 +2,9 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -56,10 +58,10 @@ class RegistrationView(APIView):
 
 @api_view(['GET', 'PATCH'])
 def single_profile_view(request, pk):
-    pass
+
     if request.method == 'GET':
-        user = User.objects.get(pk=request.user.id)
-        profile = UserProfile.objects.get(user=user)
+        user = User.objects.get(pk=pk)
+        profile = get_object_or_404(UserProfile, user=user)
         if profile:
             serializer = UserProfileSerializer(profile)
             data = serializer.data
