@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.http import Http404
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -59,18 +60,21 @@ class RegistrationView(APIView):
 class SingleProfileView(APIView):
 
     def get(self, request, pk):
-        user = User.objects.get(pk=pk)
-        profile = get_object_or_404(UserProfile, user=user)
-        serializer = UserProfileSerializer(profile)
-        data = serializer.data
-        data.update({
-            'username': user.username,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'email': user.email,
-            'created_at': user.date_joined
-        })
-        return Response(data, status=status.HTTP_200_OK)
+        try:
+            user = User.objects.get(pk=pk)
+            profile = get_object_or_404(UserProfile, user=user)
+            serializer = UserProfileSerializer(profile)
+            data = serializer.data
+            data.update({
+                'username': user.username,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'created_at': user.date_joined
+            })
+            return Response(data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            raise Http404('Profil nicht gefunden.')
 
     def patch(self, request, pk):
         pass

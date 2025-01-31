@@ -42,12 +42,11 @@ class TestProfiles(APITestCase):
     """
     Tests the functionality for handling the try to GET a user, which doesn't exist.
     """
-    # def test_auth_non_existing_single_profile_get(self):
-    #     url = reverse('profile-detail', kwargs={'pk':13337})
-    #     self.client.force_authenticate(user=self.user)
-    #     response = self.client.get(url)
-    #     # 404 doesn't raise
-    #     self.assertEqual(response.status_code, 404)
+    def test_auth_non_existing_single_profile_get(self):
+        url = reverse('profile-detail', kwargs={'pk':13337})
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
 
     """
