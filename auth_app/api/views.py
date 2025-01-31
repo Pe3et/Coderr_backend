@@ -56,20 +56,21 @@ class RegistrationView(APIView):
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET', 'PATCH'])
-def single_profile_view(request, pk):
+class SingleProfileView(APIView):
 
-    if request.method == 'GET':
+    def get(self, request, pk):
         user = User.objects.get(pk=pk)
         profile = get_object_or_404(UserProfile, user=user)
-        if profile:
-            serializer = UserProfileSerializer(profile)
-            data = serializer.data
-            data['username'] = user.username
-            data['first_name'] = user.first_name
-            data['last_name'] = user.last_name
-            data['email'] = user.email
-            data['created_at'] = user.date_joined
-            return Response(data, status=status.HTTP_200_OK)
-        else:
-            return Response({'non_field_errors': 'Profil nicht gefunden'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = UserProfileSerializer(profile)
+        data = serializer.data
+        data.update({
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'created_at': user.date_joined
+        })
+        return Response(data, status=status.HTTP_200_OK)
+
+    def patch(self, request, pk):
+        pass
