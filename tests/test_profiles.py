@@ -53,13 +53,13 @@ class TestProfiles(APITestCase):
     PATCH single profile
     """
     """
-    Tests the unauthorized single profile PATCH request.
+    Tests the authorized single profile PATCH request.
     """
-    def test_unauth_single_profile_patch(self):
+    def test_auth_single_profile_patch(self):
         pass
 
     """
-    Tests the authorized single profile PATCH request.
+    Tests the unauthorized single profile PATCH request.
     """
     def test_unauth_single_profile_patch(self):
         pass
@@ -67,7 +67,12 @@ class TestProfiles(APITestCase):
     """
     Tests a bad single profile PATCH request.
     """
-    def test_unauth_single_profile_patch(self):
+    def test_bad_single_profile_patch(self):
         pass
 
-    # a user shouldn't be able to patch another users profile
+    """
+    Tests a hacking attempt with Token from another user to PATCH another users profile.
+    """
+    def test_hacking_single_profile_patch(self):
+        pass
+
