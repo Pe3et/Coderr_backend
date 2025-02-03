@@ -6,9 +6,39 @@ from auth_app.api.models import UserProfile
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    email = serializers.EmailField(source='user.email')
+
     class Meta:
         model = UserProfile
         exclude = ['id']
+
+    """
+    To handle the PATCH for a UserProfile with it's connected User
+    """
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', {})
+        user = instance.user
+        user.first_name = user_data.get('first_name', user.first_name)
+        user.last_name = user_data.get('last_name', user.last_name)
+        user.email = user_data.get('email', user.email)
+        user.save()
+        return super().update(instance, validated_data)
+    
+    """
+    Validates if the email isn't already registered or wrong format with custom error message.
+    """
+    def validate_email(self, value):
+        try:
+            validate_email(value)
+        except:
+            raise serializers.ValidationError(['E-Mail-Format ist ungültig.'])
+
+        if self.instance and value != self.instance.user.email and User.objects.filter(email=value).exists():
+            raise serializers.ValidationError(['Diese E-Mail-Adresse ist bereits registriert.'])
+
+        return value
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

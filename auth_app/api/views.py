@@ -76,4 +76,17 @@ class SingleProfileView(APIView):
             raise Http404('Profil nicht gefunden.')
 
     def patch(self, request, pk):
-        pass
+        try:
+            user = User.objects.get(pk=pk)
+            profile = get_object_or_404(UserProfile, user=user)
+            serializer = UserProfileSerializer(profile, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except User.DoesNotExist:
+            raise Http404('Profil nicht gefunden.')
+        except UserProfile.DoesNotExist:
+            raise Http404('Profil nicht gefunden.')
+        

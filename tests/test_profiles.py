@@ -56,7 +56,10 @@ class TestProfiles(APITestCase):
     Tests the authorized single profile PATCH request.
     """
     def test_auth_single_profile_patch(self):
-        pass
+        url = reverse('profile-detail', kwargs={'pk':self.user.id})
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(url, { 'first_name': 'test'})
+        self.assertEqual(response.status_code, 200)
 
     """
     Tests the unauthorized single profile PATCH request.
@@ -68,7 +71,17 @@ class TestProfiles(APITestCase):
     Tests a bad single profile PATCH request.
     """
     def test_bad_single_profile_patch(self):
-        pass
+        url = reverse('profile-detail', kwargs={'pk':self.user.id})
+        self.client.force_authenticate(user=self.user)
+
+    """
+    Tests to PATCH a non-existing user profile.
+    """
+    def test_hacking_single_profile_patch(self):
+        url = reverse('profile-detail', kwargs={'pk':13337})
+        self.client.force_authenticate(user=self.user)
+        response = self.client.patch(url, { 'first_name': 'test'})
+        self.assertEqual(response.status_code, 404)
 
     """
     Tests a hacking attempt with Token from another user to PATCH another users profile.
