@@ -39,6 +39,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(['Diese E-Mail-Adresse ist bereits registriert.'])
 
         return value
+    
+    """
+    Raises 400 for bad requests.
+    """
+    def validate(self, data):
+        if not data:
+            raise serializers.ValidationError(['Ungültige oder fehlende Felder.'])
+        return data
 
 
 class RegistrationSerializer(serializers.ModelSerializer):

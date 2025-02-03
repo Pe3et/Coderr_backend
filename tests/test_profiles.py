@@ -65,7 +65,9 @@ class TestProfiles(APITestCase):
     Tests the unauthorized single profile PATCH request.
     """
     def test_unauth_single_profile_patch(self):
-        pass
+        url = reverse('profile-detail', kwargs={'pk':self.user.id})
+        response = self.client.patch(url, { 'first_name': 'test'})
+        self.assertEqual(response.status_code, 403)
         
     """
     Tests a bad single profile PATCH request.
@@ -73,6 +75,8 @@ class TestProfiles(APITestCase):
     def test_bad_single_profile_patch(self):
         url = reverse('profile-detail', kwargs={'pk':self.user.id})
         self.client.force_authenticate(user=self.user)
+        response = self.client.patch(url, { 'wrong': 'wrong'})
+        self.assertEqual(response.status_code, 400)
 
     """
     Tests to PATCH a non-existing user profile.
