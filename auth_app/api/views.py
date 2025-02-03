@@ -1,9 +1,9 @@
 from django.contrib.auth.models import User
 from django.http import Http404
 from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
@@ -79,6 +79,8 @@ class SingleProfileView(APIView):
         try:
             user = User.objects.get(pk=pk)
             profile = get_object_or_404(UserProfile, user=user)
+            if request.user != user and not request.user.is_superuser:
+                raise PermissionDenied('Nur der Besitzer kann das Profil bearbeiten.')
             serializer = UserProfileSerializer(profile, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()

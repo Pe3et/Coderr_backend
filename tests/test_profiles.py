@@ -18,6 +18,16 @@ class TestProfiles(APITestCase):
         serializer.is_valid(raise_exception=True)
         self.user = serializer.save()
 
+        hacking_user_data = {
+            'username': 'hackinguser',
+            'email': 'hackinguser@example.com',
+            'password': 'password',
+            'repeated_password': 'password',
+            'type': 'customer'
+        }
+        serializer = RegistrationSerializer(data=hacking_user_data)
+        serializer.is_valid(raise_exception=True)
+        self.hacking_user = serializer.save()
 
     """
     GET single profile
@@ -88,8 +98,10 @@ class TestProfiles(APITestCase):
         self.assertEqual(response.status_code, 404)
 
     """
-    Tests a hacking attempt with Token from another user to PATCH another users profile.
+    Tests a case where someone wants to hack another profile with another 'valid' Token.
     """
     def test_hacking_single_profile_patch(self):
-        pass
-
+        url = reverse('profile-detail', kwargs={'pk':self.user.id})
+        self.client.force_authenticate(user=self.hacking_user)
+        response = self.client.patch(url, { 'first_name': 'hackingtest'})
+        self.assertEqual(response.status_code, 403)
