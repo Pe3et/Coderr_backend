@@ -105,3 +105,19 @@ class TestProfiles(APITestCase):
         self.client.force_authenticate(user=self.hacking_user)
         response = self.client.patch(url, { 'first_name': 'hackingtest'})
         self.assertEqual(response.status_code, 403)
+
+    """
+    Tests GET business list.
+    """
+    def test_business_list(self):
+        url = reverse('business-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200) 
+
+    """
+    Tests GET customer list.
+    """
+    def test_business_list(self):
+        url = reverse('customer-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200) 

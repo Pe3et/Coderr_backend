@@ -1,8 +1,10 @@
 from django.contrib.auth.models import User
 from django.http import Http404
 from rest_framework import status
+from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.decorators import permission_classes
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny
@@ -90,3 +92,14 @@ class SingleProfileView(APIView):
         except UserProfile.DoesNotExist:
             raise Http404('Profil nicht gefunden.')
         
+
+class BusinessListView(generics.ListAPIView):
+    queryset = UserProfile.objects.filter(type='business').order_by('user')
+    serializer_class = UserProfileSerializer
+    permission_classes = [AllowAny]
+
+
+class CustomerListView(generics.ListAPIView):
+    queryset = UserProfile.objects.filter(type='customer').order_by('user')
+    serializer_class = UserProfileSerializer
+    permission_classes = [AllowAny]
