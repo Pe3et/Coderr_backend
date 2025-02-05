@@ -7,3 +7,4 @@ from offers_and_orders.api.serializers import OfferSerializer
 class OfferViewSet(viewsets.ModelViewSet):
     queryset = Offer.objects.all()
     serializer_class = OfferSerializer
+    filterset_fields = ['min_price']

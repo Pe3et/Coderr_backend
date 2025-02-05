@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase, force_authenticate
+from rest_framework.test import APITestCase
 
 from offers_and_orders.api.models import Offer
 
@@ -64,3 +64,13 @@ class TestOffers(APITestCase):
         data = self.offer_data
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    """
+    Tests GET offers list.
+    """
+    def test_get_offers_list(self):
+        url = reverse('offers-list')
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get(url)
+        print(response.data['results'])
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
