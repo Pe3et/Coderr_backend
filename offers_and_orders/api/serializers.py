@@ -76,6 +76,11 @@ class OfferSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
+    def validate_details(self, value):
+        if len(value) != 3:
+            raise serializers.ValidationError("Ein Angebot muss genau 3 Varianten haben.")
+        return value
+    
     """
     Gets the min_price of the related OfferDetails.
     """
