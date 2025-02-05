@@ -58,12 +58,14 @@ class OfferSerializer(serializers.ModelSerializer):
                 offer_detail.features.add(feature)
             
         offer.min_price = self.get_min_price(offer)
+        offer.min_delivery_time = self.get_min_delivery_time(offer)
         offer.save()
         return offer
     
     def update(self, instance, validated_data):
         instance = super().update(instance, validated_data)
         instance.min_price = self.get_min_price(instance)
+        instance.min_delivery_time = self.get_min_delivery_time(instance)
         instance.save()
         return instance
     
@@ -72,3 +74,9 @@ class OfferSerializer(serializers.ModelSerializer):
     """
     def get_min_price(self, obj):
         return obj.details.aggregate(min_price=Min('price'))['min_price']
+    
+    """
+    Gets the min_delivery_time of the related OfferDetails.
+    """
+    def get_min_delivery_time(self, obj):
+        return obj.details.aggregate(min_delivery_time=Min('delivery_time_in_days'))['min_delivery_time']

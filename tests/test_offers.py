@@ -72,5 +72,4 @@ class TestOffers(APITestCase):
         url = reverse('offers-list')
         self.client.force_authenticate(user=self.user)
         response = self.client.get(url)
-        print(response.data['results'])
         self.assertEqual(response.status_code, status.HTTP_200_OK)
