@@ -3,6 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from auth_app.api.serializers import RegistrationSerializer
 from offers_and_orders.api.models import Offer
 
 
@@ -40,17 +41,43 @@ class TestOffers(APITestCase):
         }
 
     def setUp(self):
-        self.user = User.objects.create_user(
-            username='testuser',
-            email='testuser@example.com',
-            password='password'
-        )
+        business_user_data = {
+            'username': 'offers_business_testuser',
+            'email': 'offers_business_testuser@example.com',
+            'password': 'password',
+            'repeated_password': 'password',
+            'type': 'business'
+        }
+        serializer = RegistrationSerializer(data=business_user_data)
+        serializer.is_valid(raise_exception=True)
+        self.business_user = serializer.save()
+
+        customer_user_data = {
+            'username': 'offers_customer_testuser',
+            'email': 'offers_customer_testuser@example.com',
+            'password': 'password',
+            'repeated_password': 'password',
+            'type': 'customer'
+        }
+        serializer = RegistrationSerializer(data=customer_user_data)
+        serializer.is_valid(raise_exception=True)
+        self.customer_user = serializer.save()
 
     """
-    Tests unauthorized offer POST.
+    Tests fully unauthorized offer POST.
     """
     def test_unauth_post_offer(self):
         url = reverse('offers-list')
+        data = self.offer_data
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    """
+    Tests customer unauthorized offer POST.
+    """
+    def test_unauth_post_offer(self):
+        url = reverse('offers-list')
+        self.client.force_authenticate(user=self.customer_user)
         data = self.offer_data
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -60,7 +87,7 @@ class TestOffers(APITestCase):
     """
     def test_auth_post_offer(self):
         url = reverse('offers-list')
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.business_user)
         data = self.offer_data
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -70,6 +97,6 @@ class TestOffers(APITestCase):
     """
     def test_get_offers_list(self):
         url = reverse('offers-list')
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.customer_user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)

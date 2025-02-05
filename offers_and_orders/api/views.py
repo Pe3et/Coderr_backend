@@ -9,7 +9,7 @@ from offers_and_orders.api.models import Offer
 from offers_and_orders.api.serializers import OfferSerializer
 
 class OfferViewSet(viewsets.ModelViewSet):
-    queryset = Offer.objects.all()
+    queryset = Offer.objects.all().order_by('id')
     serializer_class = OfferSerializer
     filterset_fields = ['min_price']
 
@@ -36,12 +36,12 @@ class OfferViewSet(viewsets.ModelViewSet):
                 for detail in Offer.objects.get(id=item['id']).details.all()
             ]
 
-        creator = Offer.objects.get(id=item['id']).creator
-        item['user_details'] = {
-            'first_name': creator.first_name,
-            'last_name': creator.last_name,
-            'username': creator.username
-        }
+            creator = Offer.objects.get(id=item['id']).creator
+            item['user_details'] = {
+                'first_name': creator.first_name,
+                'last_name': creator.last_name,
+                'username': creator.username
+            }
     
         return data
     
