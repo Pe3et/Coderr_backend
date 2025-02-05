@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.urls import reverse
 from rest_framework import status, viewsets
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
+from auth_app.api.models import UserProfile
 from offers_and_orders.api.models import Offer
 from offers_and_orders.api.serializers import OfferSerializer
 
@@ -42,3 +44,16 @@ class OfferViewSet(viewsets.ModelViewSet):
         }
     
         return data
+    
+    """
+    To ensure only business users can create new offers.
+    """
+    def create(self, request, *args, **kwargs):
+        userProfile = UserProfile.objects.get(user=request.user)
+        if userProfile.type == 'business': 
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+        else:
+            raise PermissionDenied()
+        
