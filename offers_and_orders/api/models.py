@@ -10,6 +10,8 @@ class Offer(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='offers')
     min_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     min_delivery_time = models.IntegerField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Feature(models.Model):
