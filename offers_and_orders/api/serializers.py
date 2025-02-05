@@ -30,7 +30,13 @@ class OfferDetailSerializer(serializers.ModelSerializer):
             features.append(feature)
 
         offer_detail.features.set(features)
+
         return offer_detail
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['features'] = [feature.name for feature in instance.features.all()]
+        return representation
 
 
 class OfferSerializer(serializers.ModelSerializer):
@@ -60,6 +66,7 @@ class OfferSerializer(serializers.ModelSerializer):
         offer.min_price = self.get_min_price(offer)
         offer.min_delivery_time = self.get_min_delivery_time(offer)
         offer.save()
+
         return offer
     
     def update(self, instance, validated_data):
