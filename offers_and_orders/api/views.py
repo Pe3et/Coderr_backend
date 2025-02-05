@@ -54,6 +54,7 @@ class OfferViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            raise PermissionDenied()
+            raise PermissionDenied("Nur Anbieter dürfen Angebote erstellen.")
         
