@@ -100,3 +100,26 @@ class TestOffers(APITestCase):
         self.client.force_authenticate(user=self.customer_user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    """
+    Tests partial offer PATCH with new details containing new features.
+    """
+    def test_patch_offer_partial(self):
+        url = reverse('offers-detail', kwargs=[self.offer.id])
+        self.client.force_authenticate(user=self.business_user)
+        data = {
+            'title': 'new package title',
+            'details': [
+                {
+                'title': 'new basictitle',
+                'features': ['newfeature', 'Visitenkarte'],
+                'price': 1000,
+                'revisions': 3,
+                'delivery_time_in_days': 6,
+                'offer_type': 'basic'
+                }
+            ]
+        }
+        response = self.client.patch(url, data, format='json')
+        print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -33,6 +33,22 @@ class OfferDetailSerializer(serializers.ModelSerializer):
 
         return offer_detail
     
+    def update(self, instance, validated_data):
+        features_data = validated_data.pop('features', None)
+        
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        
+        if features_data is not None:
+            features = []
+            for feature_name in features_data:
+                feature, created = Feature.objects.get_or_create(name=feature_name)
+                features.append(feature)
+            instance.features.set(features)
+        
+        instance.save()
+        return instance
+
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         representation['features'] = [feature.name for feature in instance.features.all()]

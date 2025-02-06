@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.urls import reverse
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
@@ -79,9 +78,23 @@ class OfferViewSet(viewsets.ModelViewSet):
     """
     Handles the PATCH.
     """
-    # def partial_update(self, request, *args, **kwargs):
-    #     offer = Offer.objects.get(title=request.data['title'])
-    #     offer_type = request.data['type']
+    def partial_update(self, request, *args, **kwargs):
+        offer_obj = self.get_object()
+        new_offer_detail_data = request.data['details'][0]
+        offer_type = new_offer_detail_data['offer_type']
+        offer_detail_obj = OfferDetail.objects.get(offer=offer_obj, offer_type=offer_type)
+        serializer = OfferDetailSerializer(offer_detail_obj, data=new_offer_detail_data, partial=True)
+        if serializer.is_valid():
+            offer_detail = serializer.save()
+
+            response_data = {
+                'id': offer_obj.id,
+                'title': offer_obj.title,
+                'details': OfferDetailSerializer(offer_detail).data
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
