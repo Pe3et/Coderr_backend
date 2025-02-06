@@ -58,3 +58,20 @@ class OfferViewSet(viewsets.ModelViewSet):
         else:
             raise PermissionDenied("Nur Anbieter dürfen Angebote erstellen.")
         
+    """
+    Adds user-details to the single view response.
+    """
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        
+        creator = instance.user
+        data['user_details'] = {
+            'first_name': creator.first_name,
+            'last_name': creator.last_name,
+            'username': creator.username
+        }
+        
+        return Response(data)
+        
