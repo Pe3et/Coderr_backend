@@ -36,7 +36,7 @@ class OfferViewSet(viewsets.ModelViewSet):
                 for detail in Offer.objects.get(id=item['id']).details.all()
             ]
 
-            creator = Offer.objects.get(id=item['id']).creator
+            creator = Offer.objects.get(id=item['id']).user
             item['user_details'] = {
                 'first_name': creator.first_name,
                 'last_name': creator.last_name,
