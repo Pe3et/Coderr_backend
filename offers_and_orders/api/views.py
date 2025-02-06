@@ -1,12 +1,13 @@
 from django.shortcuts import render
 from django.urls import reverse
 from rest_framework import status, viewsets
+from rest_framework.decorators import api_view
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from auth_app.api.models import UserProfile
-from offers_and_orders.api.models import Offer
-from offers_and_orders.api.serializers import OfferSerializer
+from offers_and_orders.api.models import Offer, OfferDetail
+from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer
 
 class OfferViewSet(viewsets.ModelViewSet):
     queryset = Offer.objects.all().order_by('id')
@@ -74,4 +75,14 @@ class OfferViewSet(viewsets.ModelViewSet):
         }
         
         return Response(data)
-        
+
+
+@api_view(['GET'])
+def offerdetailsView(request, pk):
+    try:
+        offer_detail = OfferDetail.objects.get(pk=pk)
+    except OfferDetail.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    serializer = OfferDetailSerializer(offer_detail)
+    return Response(serializer.data)
