@@ -75,6 +75,13 @@ class OfferViewSet(viewsets.ModelViewSet):
         }
         
         return Response(data)
+    
+    """
+    Handles the PATCH.
+    """
+    # def partial_update(self, request, *args, **kwargs):
+    #     offer = Offer.objects.get(title=request.data['title'])
+    #     offer_type = request.data['type']
 
 
 @api_view(['GET'])
