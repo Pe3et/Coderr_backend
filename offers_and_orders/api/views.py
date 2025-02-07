@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from auth_app.api.models import UserProfile
 from offers_and_orders.api.models import Offer, OfferDetail
-from offers_and_orders.api.permissions import IsBusinessOrAdmin
+from offers_and_orders.api.permissions import IsBusinessAndOwnerOrAdmin
 from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer
 
 class OfferViewSet(viewsets.ModelViewSet):
@@ -22,7 +22,7 @@ class OfferViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             permission_classes = [IsAuthenticated]
         else:
-            permission_classes = [IsBusinessOrAdmin]
+            permission_classes = [IsBusinessAndOwnerOrAdmin]
         return [permission() for permission in permission_classes]
 
     """

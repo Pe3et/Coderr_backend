@@ -147,3 +147,39 @@ class TestOffers(APITestCase):
         }
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    """
+    Recalls the auth_post_offer, creates a second business user and tests
+    unathuorized partial PATCH from another business, which doesn't own the offer.
+    """
+    def test_unauth_business_patch_offer_partial(self):
+        self.test_auth_post_offer()
+
+        second_business_user_data = {
+            'username': 'second_offers_business_testuser',
+            'email': 'second_offers_business_testuser@example.com',
+            'password': 'password',
+            'repeated_password': 'password',
+            'type': 'business'
+        }
+        serializer = RegistrationSerializer(data=second_business_user_data)
+        serializer.is_valid(raise_exception=True)
+        second_business_user = serializer.save()
+
+        url = reverse('offers-detail', kwargs={'pk': 1})
+        self.client.force_authenticate(user=second_business_user)
+        data = {
+            'title': 'new package title',
+            'details': [
+                {
+                'title': 'new basictitle',
+                'features': ['newfeature', 'Visitenkarte'],
+                'price': 1000,
+                'revisions': 3,
+                'delivery_time_in_days': 6,
+                'offer_type': 'basic'
+                }
+            ]
+        }
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
