@@ -1,19 +1,33 @@
+from django_filters import FilterSet, NumberFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from django.urls import reverse
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, filters
 from rest_framework.decorators import api_view
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from auth_app.api.models import UserProfile
 from offers_and_orders.api.models import Offer, OfferDetail
 from offers_and_orders.api.permissions import IsBusinessAndOwnerOrAdmin
 from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer
 
+
+class OfferFilter(FilterSet):
+    creator_id = NumberFilter(field_name='user__id')
+    min_price = NumberFilter(field_name='min_price', lookup_expr='gte')
+    max_delivery_time = NumberFilter(field_name='max_delivery_time', lookup_expr='lte')
+
+    class Meta:
+        model = Offer
+        fields = ['min_price', 'max_delivery_time', 'creator_id']
+
+
 class OfferViewSet(viewsets.ModelViewSet):
     queryset = Offer.objects.all().order_by('id')
     serializer_class = OfferSerializer
-    filterset_fields = ['min_price']
+    filterset_class = OfferFilter
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    ordering_fields = ['updated_at', 'min_price']
+    search_fields = ['title', 'description']
 
     """
     Only Business users or superusers are allowed to change offers.
