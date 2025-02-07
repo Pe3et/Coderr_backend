@@ -183,3 +183,23 @@ class TestOffers(APITestCase):
         }
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    """
+    Tests unauthorized single DELETE.
+    """
+    def test_unauth_delete(self):
+        self.test_auth_post_offer()
+        url = reverse('offers-detail', kwargs={'pk': 1})
+        self.client.force_authenticate(user=self.customer_user)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    """
+    Tests authorized single DELETE.
+    """
+    def test_auth_delete(self):
+        self.test_auth_post_offer()
+        url = reverse('offers-detail', kwargs={'pk': 1})
+        self.client.force_authenticate(user=self.business_user)
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
