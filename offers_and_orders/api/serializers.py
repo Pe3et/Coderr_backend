@@ -61,15 +61,14 @@ class OfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
         fields = '__all__'
-        read_only_fields = ['id', 'creator', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
 
     """
     Handles the creation of an offer with all it's details and their features.
     """
     def create(self, validated_data):
         details_data = validated_data.pop('details')
-        user = self.context['request'].user
-        offer = Offer.objects.create(creator=user, **validated_data)
+        offer = Offer.objects.create(**validated_data)
 
         for detail_data in details_data:
             features_data = detail_data.pop('features', [])

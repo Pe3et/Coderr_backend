@@ -83,7 +83,7 @@ class TestOffers(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     """
-    Tests authorized offer POST.
+    Tests business authorized offer POST.
     """
     def test_auth_post_offer(self):
         url = reverse('offers-list')
@@ -105,7 +105,7 @@ class TestOffers(APITestCase):
     Tests partial offer PATCH with new details containing new features.
     """
     def test_patch_offer_partial(self):
-        url = reverse('offers-detail', kwargs=[self.offer.id])
+        url = reverse('offers-detail', kwargs={'pk': self.offer.id})
         self.client.force_authenticate(user=self.business_user)
         data = {
             'title': 'new package title',

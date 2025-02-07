@@ -36,11 +36,11 @@ class OfferViewSet(viewsets.ModelViewSet):
                 for detail in Offer.objects.get(id=item['id']).details.all()
             ]
 
-            creator = Offer.objects.get(id=item['id']).user
+            user = Offer.objects.get(id=item['id']).user
             item['user_details'] = {
-                'first_name': creator.first_name,
-                'last_name': creator.last_name,
-                'username': creator.username
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'username': user.username
             }
     
         return data
@@ -53,7 +53,7 @@ class OfferViewSet(viewsets.ModelViewSet):
         if userProfile.type == 'business': 
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
+            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             raise PermissionDenied("Nur Anbieter dürfen Angebote erstellen.")
@@ -66,11 +66,11 @@ class OfferViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(instance)
         data = serializer.data
         
-        creator = instance.user
+        user = instance.user
         data['user_details'] = {
-            'first_name': creator.first_name,
-            'last_name': creator.last_name,
-            'username': creator.username
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'username': user.username
         }
         
         return Response(data)
