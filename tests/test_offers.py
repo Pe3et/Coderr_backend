@@ -102,10 +102,11 @@ class TestOffers(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     """
-    Tests partial offer PATCH with new details containing new features.
+    Recalls the auth_post_offer and tests partial PATCH with new details containing new features.
     """
     def test_patch_offer_partial(self):
-        url = reverse('offers-detail', kwargs={'pk': self.offer.id})
+        self.test_auth_post_offer()
+        url = reverse('offers-detail', kwargs={'pk': 1})
         self.client.force_authenticate(user=self.business_user)
         data = {
             'title': 'new package title',
@@ -121,5 +122,4 @@ class TestOffers(APITestCase):
             ]
         }
         response = self.client.patch(url, data, format='json')
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
