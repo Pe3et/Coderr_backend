@@ -14,7 +14,7 @@ from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerial
 class OfferFilter(FilterSet):
     creator_id = NumberFilter(field_name='user__id')
     min_price = NumberFilter(field_name='min_price', lookup_expr='gte')
-    max_delivery_time = NumberFilter(field_name='max_delivery_time', lookup_expr='lte')
+    max_delivery_time = NumberFilter(field_name='min_delivery_time', lookup_expr='lte')
 
     class Meta:
         model = Offer
