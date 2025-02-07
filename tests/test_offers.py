@@ -123,3 +123,27 @@ class TestOffers(APITestCase):
         }
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    """
+    Recalls the auth_post_offer and tests unathuorized partial PATCH
+    with new details containing new features.
+    """
+    def test_unauth_patch_offer_partial(self):
+        self.test_auth_post_offer()
+        url = reverse('offers-detail', kwargs={'pk': 1})
+        self.client.force_authenticate(user=self.customer_user)
+        data = {
+            'title': 'new package title',
+            'details': [
+                {
+                'title': 'new basictitle',
+                'features': ['newfeature', 'Visitenkarte'],
+                'price': 1000,
+                'revisions': 3,
+                'delivery_time_in_days': 6,
+                'offer_type': 'basic'
+                }
+            ]
+        }
+        response = self.client.patch(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

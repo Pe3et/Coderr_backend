@@ -2,10 +2,12 @@ from django.urls import reverse
 from rest_framework import status, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from auth_app.api.models import UserProfile
 from offers_and_orders.api.models import Offer, OfferDetail
+from offers_and_orders.api.permissions import IsBusinessOrAdmin
 from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer
 
 class OfferViewSet(viewsets.ModelViewSet):
@@ -13,6 +15,19 @@ class OfferViewSet(viewsets.ModelViewSet):
     serializer_class = OfferSerializer
     filterset_fields = ['min_price']
 
+    """
+    Only Business users or superusers are allowed to change offers.
+    """
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsBusinessOrAdmin]
+        return [permission() for permission in permission_classes]
+
+    """
+    Handles formatting the list GET.
+    """
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
@@ -46,17 +61,13 @@ class OfferViewSet(viewsets.ModelViewSet):
         return data
     
     """
-    To ensure only business users can create new offers.
+    Handles the creation.
     """
     def create(self, request, *args, **kwargs):
-        userProfile = UserProfile.objects.get(user=request.user)
-        if userProfile.type == 'business': 
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            raise PermissionDenied("Nur Anbieter dürfen Angebote erstellen.")
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
         
     """
     Adds user-details to the single view response.
@@ -97,6 +108,9 @@ class OfferViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+"""
+Function based view for the single offerdetails endpoint.
+"""
 @api_view(['GET'])
 def offerdetailsView(request, pk):
     try:
