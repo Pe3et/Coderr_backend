@@ -204,3 +204,4 @@ class TestOffers(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {})
+        self.assertEqual(Offer.objects.count(), 0)
