@@ -121,6 +121,15 @@ class OfferViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    """
+    Handles custom delete logic.
+    """    
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        data = {}
+        return Response(data, status=status.HTTP_200_OK)
+
 
 """
 Function based view for the single offerdetails endpoint.

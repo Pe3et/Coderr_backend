@@ -202,4 +202,5 @@ class TestOffers(APITestCase):
         url = reverse('offers-detail', kwargs={'pk': 1})
         self.client.force_authenticate(user=self.business_user)
         response = self.client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {})
