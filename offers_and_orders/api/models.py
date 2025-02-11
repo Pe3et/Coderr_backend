@@ -49,7 +49,8 @@ class OfferDetail(models.Model):
 class Order(models.Model):
     STATUS_TYPES = (
         ('in_progress', 'IN_PROGRESS'),
-        ('completed', 'COMPLETED')
+        ('completed', 'COMPLETED'),
+        ('cancelled', 'CANCELLED'),
     )
 
     customer_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
