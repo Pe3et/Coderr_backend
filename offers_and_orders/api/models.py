@@ -13,9 +13,15 @@ class Offer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.title
+
 
 class Feature(models.Model):
     name = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.name
 
 
 class OfferDetail(models.Model):
@@ -36,6 +42,9 @@ class OfferDetail(models.Model):
     class Meta:
         unique_together = ('offer', 'offer_type')
 
+    def __str__(self):
+        return self.title
+
 
 class Order(models.Model):
     STATUS_TYPES = (
@@ -49,3 +58,6 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_TYPES, default='in_progress')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.offer_detail.title
