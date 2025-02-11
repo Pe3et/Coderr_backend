@@ -16,3 +16,21 @@ class IsBusinessAndOwnerOrAdmin(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         return obj.user == request.user or request.user.is_superuser
+    
+
+class IsCustomer(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            userProfile = UserProfile.objects.get(user=request.user)
+            if userProfile.type == 'customer':
+                return True
+        else:
+            return False
+        
+
+class IsSuperuser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.user.is_authenticated and request.user.is_superuser:
+                return True
+        else:
+            return False

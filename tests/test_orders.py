@@ -47,7 +47,6 @@ class testOrders(APITestCase):
     def create_offer(self):
         offer_data = test_offers.TestOffers.offer_data
         url = reverse('offers-list')
-
         self.client.force_authenticate(user=self.business_user)
         self.client.post(url, offer_data, format='json')        
         self.client.force_authenticate(user=None)
@@ -60,7 +59,6 @@ class testOrders(APITestCase):
         self.client.force_authenticate(user=self.customer_user)
         post_data = { 'offer_detail_id': 1 }
         response = self.client.post(url, post_data, format='json')
-        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         order = Order.objects.get(id=1)
         self.assertEqual(response.data['id'], 1)
@@ -75,3 +73,13 @@ class testOrders(APITestCase):
         self.assertEqual(response.data['status'], 'in_progress')
         self.assertEqual(parse_datetime(response.data['created_at']), order.created_at)
         self.assertEqual(parse_datetime(response.data['updated_at']), order.updated_at)
+
+    """
+    Tests business user trying to POST, which is not wanted. 
+    """
+    def test_business_post(self):
+        url = reverse('orders-list')
+        self.client.force_authenticate(user=self.business_user)
+        post_data = { 'offer_detail_id': 1 }
+        response = self.client.post(url, post_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

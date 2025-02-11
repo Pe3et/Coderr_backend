@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from offers_and_orders.api.models import Offer, OfferDetail, Order
-from offers_and_orders.api.permissions import IsBusinessAndOwnerOrAdmin
+from offers_and_orders.api.permissions import IsBusinessAndOwnerOrAdmin, IsCustomer, IsSuperuser
 from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer, OrderSerializer
 
 
@@ -30,7 +30,7 @@ class OfferViewSet(viewsets.ModelViewSet):
     search_fields = ['title', 'description']
 
     """
-    Only Business users or superusers are allowed to change offers.
+    Only business users or superusers are allowed to change offers.
     """
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -148,3 +148,17 @@ def offerdetailsView(request, pk):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().order_by('id')
     serializer_class = OrderSerializer
+
+    """
+    Only customer users are allowed to create orders and change the status.
+    Only admins are allowed to delete orders.
+    """
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        elif self.action in ['create', 'partial_update']:
+            permission_classes = [IsCustomer]
+        else:
+            permission_classes = [IsSuperuser]
+        
+        return [permission() for permission in permission_classes]
