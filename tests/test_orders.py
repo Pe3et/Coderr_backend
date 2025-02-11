@@ -1,9 +1,10 @@
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.fields import parse_datetime
 from rest_framework.test import APITestCase
 
 from auth_app.api.serializers import RegistrationSerializer
-from offers_and_orders.api.models import Offer
+from offers_and_orders.api.models import Offer, Order
 from tests import test_offers
 
 
@@ -48,9 +49,8 @@ class testOrders(APITestCase):
         url = reverse('offers-list')
 
         self.client.force_authenticate(user=self.business_user)
-        self.client.post(url, offer_data, format='json')
+        self.client.post(url, offer_data, format='json')        
         self.client.force_authenticate(user=None)
-        
 
     """
     Tests auth orders POST from customer_user.
@@ -60,6 +60,18 @@ class testOrders(APITestCase):
         self.client.force_authenticate(user=self.customer_user)
         post_data = { 'offer_detail_id': 1 }
         response = self.client.post(url, post_data, format='json')
+        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-        ###erst offer erstellen 
+        order = Order.objects.get(id=1)
+        self.assertEqual(response.data['id'], 1)
+        self.assertEqual(response.data['customer_user'], 2)
+        self.assertEqual(response.data['business_user'], 1)
+        self.assertEqual(response.data['title'], 'Basic Design')
+        self.assertEqual(response.data['revisions'], 2)
+        self.assertEqual(response.data['delivery_time_in_days'], 5)
+        self.assertEqual(float(response.data['price']), 100.00)
+        self.assertEqual(response.data['features'], ['Logo Design', 'Visitenkarte'])
+        self.assertEqual(response.data['offer_type'], 'basic')
+        self.assertEqual(response.data['status'], 'in_progress')
+        self.assertEqual(parse_datetime(response.data['created_at']), order.created_at)
+        self.assertEqual(parse_datetime(response.data['updated_at']), order.updated_at)

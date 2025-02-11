@@ -115,7 +115,7 @@ class OrderSerializer(serializers.ModelSerializer):
     revisions = serializers.IntegerField(source='offer_detail.revisions', read_only=True)
     delivery_time_in_days = serializers.IntegerField(source='offer_detail.delivery_time_in_days', read_only=True)
     price = serializers.DecimalField(source='offer_detail.price', max_digits=10, decimal_places=2, read_only=True)
-    features = serializers.ListField(source='offer_detail.features', read_only=True)
+    features = FeatureSerializer(many=True, read_only=True, source='offer_detail.features')
     offer_type = serializers.CharField(source='offer_detail.offer_type', read_only=True)
 
     class Meta:
@@ -123,12 +123,16 @@ class OrderSerializer(serializers.ModelSerializer):
         exclude = ['offer_detail']
         read_only_fields = ['customer_user', 'business_user', 'status', 'created_at', 'updated_at']
 
+
+    """
+    Handles the creation of a new order.
+    """
     def create(self, validated_data):
         offer_detail_id = validated_data.get('offer_detail_id')
         offer_detail_instance = OfferDetail.objects.get(id=offer_detail_id)
 
         customer_user = self.context['request'].user
-        business_user = offer_detail_instance.business_user
+        business_user = offer_detail_instance.offer.user
 
         order = Order.objects.create(
             customer_user=customer_user,
@@ -138,3 +142,13 @@ class OrderSerializer(serializers.ModelSerializer):
         )
 
         return order
+    
+    """
+    Ensures representation only shows the the name of the features as a list for respresentation.
+    """
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['features'] = [
+            feature.name for feature in instance.offer_detail.features.all()
+        ]
+        return representation
