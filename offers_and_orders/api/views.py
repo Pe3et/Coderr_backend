@@ -182,3 +182,15 @@ class OrderViewSet(viewsets.ModelViewSet):
         
         except UserProfile.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        
+
+    """
+    Only user realted orders can be retrieved.
+    """
+    def retrieve(self, request, *args, **kwargs):
+        order = self.get_object()
+        if order.customer_user == request.user or order.business_user == request.user:
+            serializer = self.get_serializer(order)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)

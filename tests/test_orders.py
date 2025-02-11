@@ -85,7 +85,7 @@ class testOrders(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     """
-    Tesst list GET.
+    Test list GET.
     """
     def test_list_get(self):
         url = reverse('orders-list')
