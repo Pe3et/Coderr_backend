@@ -6,9 +6,9 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from offers_and_orders.api.models import Offer, OfferDetail
+from offers_and_orders.api.models import Offer, OfferDetail, Order
 from offers_and_orders.api.permissions import IsBusinessAndOwnerOrAdmin
-from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer
+from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer, OrderSerializer
 
 
 class OfferFilter(FilterSet):
@@ -143,3 +143,8 @@ def offerdetailsView(request, pk):
 
     serializer = OfferDetailSerializer(offer_detail)
     return Response(serializer.data)
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all().order_by('id')
+    serializer_class = OrderSerializer
