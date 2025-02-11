@@ -183,7 +183,6 @@ class OrderViewSet(viewsets.ModelViewSet):
         except UserProfile.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         
-
     """
     Only user realted orders can be retrieved.
     """
@@ -194,3 +193,9 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
+        
+    
+    def destroy(self, request, *args, **kwargs):
+        order = self.get_object()
+        order.delete()
+        return Response({}, status=status.HTTP_200_OK)
