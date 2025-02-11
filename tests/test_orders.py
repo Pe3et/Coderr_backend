@@ -83,3 +83,12 @@ class testOrders(APITestCase):
         post_data = { 'offer_detail_id': 1 }
         response = self.client.post(url, post_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    """
+    Tesst list GET.
+    """
+    def test_list_get(self):
+        url = reverse('orders-list')
+        self.client.force_authenticate(user=self.customer_user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

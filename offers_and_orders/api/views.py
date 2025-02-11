@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from auth_app.api.models import UserProfile
 from offers_and_orders.api.models import Offer, OfferDetail, Order
 from offers_and_orders.api.permissions import IsBusinessAndOwnerOrAdmin, IsCustomer, IsSuperuser
 from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer, OrderSerializer
@@ -162,3 +163,22 @@ class OrderViewSet(viewsets.ModelViewSet):
             permission_classes = [IsSuperuser]
         
         return [permission() for permission in permission_classes]
+    
+    """
+    Returns only the orders related to the requesting users.
+    """
+    def list(self, request, *args, **kwargs):
+        try:
+            userProfile = UserProfile.objects.get(user=request.user)
+            if userProfile.type == 'customer':
+                queryset = Order.objects.filter(customer_user=request.user)
+            elif userProfile.type == 'business':
+                queryset = Order.objects.filter(business_user=request.user)
+            else:
+                queryset = Order.objects.none()
+
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        except UserProfile.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
