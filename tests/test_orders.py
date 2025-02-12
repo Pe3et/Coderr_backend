@@ -8,13 +8,12 @@ from offers_and_orders.api.models import Offer, Order
 from tests import test_offers
 
 
-class testOrders(APITestCase):
+class TestOrders(APITestCase):
 
     def setUp(self):
         self.create_users()
         self.create_offer()
 
-        
     """
     Creates a customer_user and a business_user for testing.
     """
@@ -85,10 +84,44 @@ class testOrders(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     """
-    Test list GET.
+    Tests list GET.
     """
     def test_list_get(self):
         url = reverse('orders-list')
         self.client.force_authenticate(user=self.customer_user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    """
+    Tests the partial status PATCH of an offer from the business_user.
+    """
+    def test_status_patch(self):
+        self.test_auth_post()
+        url = reverse('orders-detail', kwargs={'pk': 1})
+        self.client.force_authenticate(user=self.business_user)
+        patch_data = { 'status': 'completed' }
+        response = self.client.patch(url, patch_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['status'], 'completed')
+
+    """
+    Tests a bad PATCH from a business_user.
+    """
+    def test_bad_business_patch(self):
+        self.test_auth_post()
+        url = reverse('orders-detail', kwargs={'pk': 1})
+        self.client.force_authenticate(user=self.business_user)
+        patch_data = { 'title': 'test bad patch' }
+        response = self.client.patch(url, patch_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    """
+    Tests the partial status PATCH from a customer_user.
+    """
+    def test_unauth_patch(self):
+        self.test_auth_post()
+        url = reverse('orders-detail', kwargs={'pk': 1})
+        self.client.force_authenticate(user=self.customer_user)
+        patch_data = { 'status': 'completed' }
+        response = self.client.patch(url, patch_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

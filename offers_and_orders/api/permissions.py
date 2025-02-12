@@ -27,6 +27,22 @@ class IsCustomer(permissions.BasePermission):
         else:
             return False
         
+    def has_object_permission(self, request, view, obj):
+        return obj.customer_user == request.user
+        
+
+class IsBusiness(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            userProfile = UserProfile.objects.get(user=request.user)
+            if userProfile.type == 'business':
+                return True
+        else:
+            return False
+        
+    def has_object_permission(self, request, view, obj):
+        return obj.business_user == request.user
+        
 
 class IsSuperuser(permissions.BasePermission):
     def has_permission(self, request, view):

@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from auth_app.api.models import UserProfile
 from offers_and_orders.api.models import Offer, OfferDetail, Order
-from offers_and_orders.api.permissions import IsBusinessAndOwnerOrAdmin, IsCustomer, IsSuperuser
+from offers_and_orders.api.permissions import IsBusiness, IsBusinessAndOwnerOrAdmin, IsCustomer, IsSuperuser
 from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer, OrderSerializer
 
 
@@ -157,8 +157,10 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             permission_classes = [IsAuthenticated]
-        elif self.action in ['create', 'partial_update']:
+        elif self.action == 'create':
             permission_classes = [IsCustomer]
+        elif self.action == 'partial_update':
+            permission_classes = [IsBusiness]
         else:
             permission_classes = [IsSuperuser]
         
@@ -194,8 +196,26 @@ class OrderViewSet(viewsets.ModelViewSet):
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
         
-    
     def destroy(self, request, *args, **kwargs):
         order = self.get_object()
         order.delete()
         return Response({}, status=status.HTTP_200_OK)
+    
+    """
+    Only the status can be patched by the related business user. 
+    """
+    def partial_update(self, request, *args, **kwargs):
+        order = self.get_object()
+        if order.business_user == request.user:
+            new_status = request.data.get('status')
+            if not new_status:
+                return Response(
+                    {'detail': 'Bitte gebe einen gültigen neuen Status an.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            order.status = new_status
+            order.save()
+            serializer = self.get_serializer(order)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
