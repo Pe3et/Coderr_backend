@@ -1,8 +1,9 @@
+from django.contrib.auth.models import User
 from django_filters import FilterSet, NumberFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from django.urls import reverse
 from rest_framework import status, viewsets, filters
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -219,3 +220,31 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
+        
+
+"""
+Function based view for returning the open order count of a business user.
+"""
+@api_view(['GET'])
+def openOrderCount(request, business_user_id):
+    user = User.objects.get(id=business_user_id)
+    user_profile = UserProfile.objects.get(user=user)
+    if user_profile.type == 'business':
+        open_orders = Order.objects.filter(business_user=user, status='in_progress')
+        return Response({'order_count': open_orders.count()}, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'Business user not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+"""
+Function based view for returning the completed order count of a business user.
+"""
+@api_view(['GET'])
+def completedOrderCount(request, business_user_id):
+    user = User.objects.get(id=business_user_id)
+    user_profile = UserProfile.objects.get(user=user)
+    if user_profile.type == 'business':
+        completed_orders = Order.objects.filter(business_user=user, status='completed')
+        return Response({'completed_order_count': completed_orders.count()}, status=status.HTTP_200_OK)
+    else:
+        return Response({'error': 'Business user not found.'}, status=status.HTTP_404_NOT_FOUND)

@@ -125,3 +125,47 @@ class TestOrders(APITestCase):
         patch_data = { 'status': 'completed' }
         response = self.client.patch(url, patch_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    """
+    Tests open business orders count endpoint.
+    """
+    def test_open_business_orders_count(self):
+        self.test_auth_post()
+        url = reverse('open-order-count', kwargs={'business_user_id': self.business_user.id})
+        self.client.force_authenticate(user=self.business_user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['order_count'], Order.objects.filter(status='in_progress').count())
+
+    """
+    Tests open business orders count endpoint with business user not existing.
+    """
+    def test_open_business_orders_count_not_found(self):
+        self.test_auth_post()
+        url = reverse('open-order-count', kwargs={'business_user_id': self.customer_user.id})
+        self.client.force_authenticate(user=self.customer_user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['error'], 'Business user not found.')
+
+    """
+    Tests completed business orders count endpoint.
+    """
+    def test_completed_business_orders_count(self):
+        self.test_status_patch()
+        url = reverse('completed-order-count', kwargs={'business_user_id': self.business_user.id})
+        self.client.force_authenticate(user=self.business_user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['completed_order_count'], Order.objects.filter(status='completed').count())
+
+    """
+    Tests completed business orders count endpoint with business user not existing.
+    """
+    def test_completed_business_orders_count_not_found(self):
+        self.test_status_patch()
+        url = reverse('completed-order-count', kwargs={'business_user_id': self.customer_user.id})
+        self.client.force_authenticate(user=self.customer_user)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data['error'], 'Business user not found.')
