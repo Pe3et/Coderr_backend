@@ -229,6 +229,7 @@ Function based view for returning the open order count of a business user.
 def openOrderCount(request, business_user_id):
     user = User.objects.get(id=business_user_id)
     user_profile = UserProfile.objects.get(user=user)
+
     if user_profile.type == 'business':
         open_orders = Order.objects.filter(business_user=user, status='in_progress')
         return Response({'order_count': open_orders.count()}, status=status.HTTP_200_OK)
@@ -253,6 +254,9 @@ def completedOrderCount(request, business_user_id):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all().order_by('id')
     serializer_class = ReviewSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    ordering_fields = ['updated_at', 'rating']
+    pagination_class = None
 
     """
     All authorized users can read reviews,
@@ -266,9 +270,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
             permission_classes = [IsCustomer]
         
         return [permission() for permission in permission_classes]
-
-    def list(self, request, *args, **kwargs):
-        pass
         
     def destroy(self, request, *args, **kwargs):
         review = self.get_object()
