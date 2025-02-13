@@ -49,3 +49,44 @@ class TestReviews(APITestCase):
         self.client.force_authenticate(user=self.customer_user)
         response = self.client.post(url, review_test_data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    """
+    Tests general unathorized review POST.
+    """
+    def test_unauthorized_review_post(self):
+        url = reverse('reviews-list')
+        review_test_data = {
+            'business_user': self.business_user.id,
+            'description': 'test',
+            'rating': 5
+        }
+        response = self.client.post(url, review_test_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    """
+    Tests bad review POST.
+    """
+    def test_bad_review_post(self):
+        url = reverse('reviews-list')
+        bad_review_test_data = {
+            'business_user': self.business_user.id,
+            'description': 'test',
+            'rating': 6
+        }
+        self.client.force_authenticate(user=self.customer_user)
+        response = self.client.post(url, bad_review_test_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    """
+    Tests review POST coming from a business, which is not allowed.
+    """
+    def test_review_post_from_business(self):
+        url = reverse('reviews-list')
+        review_test_data = {
+            'business_user': self.business_user.id,
+            'description': 'test',
+            'rating': 5
+        }
+        self.client.force_authenticate(user=self.business_user)
+        response = self.client.post(url, review_test_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
