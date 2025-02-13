@@ -8,9 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from auth_app.api.models import UserProfile
-from offers_and_orders.api.models import Offer, OfferDetail, Order
+from offers_and_orders.api.models import Offer, OfferDetail, Order, Review
 from offers_and_orders.api.permissions import IsBusiness, IsBusinessAndOwnerOrAdmin, IsCustomer, IsSuperuser
-from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer, OrderSerializer
+from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer, OrderSerializer, ReviewSerializer
 
 
 class OfferFilter(FilterSet):
@@ -248,3 +248,47 @@ def completedOrderCount(request, business_user_id):
         return Response({'completed_order_count': completed_orders.count()}, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Business user not found.'}, status=status.HTTP_404_NOT_FOUND)
+    
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all().order_by('id')
+    serializer_class = ReviewSerializer
+
+    """
+    All authorized users can read reviews,
+    but only authenticated customers are allowed to write reviews.
+    The superuser can do everyhing.
+    """
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [IsAuthenticated]
+        else:
+            permission_classes = [IsCustomer]
+        
+        return [permission() for permission in permission_classes]
+
+    def list(self, request, *args, **kwargs):
+        pass
+        
+    def destroy(self, request, *args, **kwargs):
+        review = self.get_object()
+        review.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    """
+    Only the rating and comment can be patched. 
+    """
+    def partial_update(self, request, *args, **kwargs):
+        review = self.get_object()
+        new_rating = request.data.get('rating')
+        new_comment = request.data.get('comment')
+        if not new_rating and not new_comment:
+            return Response(
+                {'detail': 'Fehlende neue Bewertung oder Beschreibung.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        review.rating = new_rating if new_rating else review.rating
+        review.comment = new_comment if new_comment else review.comment
+        review.save()
+        serializer = self.get_serializer(review)
+        return Response(serializer.data, status=status.HTTP_200_OK)

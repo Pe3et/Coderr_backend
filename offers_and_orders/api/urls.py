@@ -1,12 +1,14 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from offers_and_orders.api.views import OfferViewSet, OrderViewSet, completedOrderCount, offerdetailsView, openOrderCount
+from offers_and_orders.api.views import OfferViewSet, OrderViewSet, ReviewViewSet, completedOrderCount, offerdetailsView, openOrderCount
 
 
 router = routers.SimpleRouter()
 router.register(r'offers', OfferViewSet, basename='offers')
 router.register(r'orders', OrderViewSet, basename='orders')
+router.register(r'reviews', ReviewViewSet, basename='reviews')
+
 
 urlpatterns = [
     path('', include(router.urls)),

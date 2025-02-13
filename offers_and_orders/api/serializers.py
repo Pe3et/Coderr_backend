@@ -1,7 +1,9 @@
+from django.contrib.auth.models import User
 from django.db.models import Min
 from rest_framework import serializers
 
-from offers_and_orders.api.models import Feature, Offer, OfferDetail, Order
+from auth_app.api.models import UserProfile
+from offers_and_orders.api.models import Feature, Offer, OfferDetail, Order, Review
 
 
 class FeatureSerializer(serializers.ModelSerializer):
@@ -123,7 +125,6 @@ class OrderSerializer(serializers.ModelSerializer):
         exclude = ['offer_detail']
         read_only_fields = ['customer_user', 'business_user', 'status', 'created_at', 'updated_at']
 
-
     """
     Handles the creation of a new order.
     """
@@ -152,3 +153,32 @@ class OrderSerializer(serializers.ModelSerializer):
             feature.name for feature in instance.offer_detail.features.all()
         ]
         return representation
+    
+
+class ReviewSerializer(serializers.ModelSerializer): 
+
+    class Meta:
+        model = Review
+        fields = '__all__'
+        read_only_fields = ['id', 'reviewer', 'created_at', 'updated_at']
+
+    """
+    Handles the creation of a review and checks if a customer reviews a business.
+    """
+    def create(self, validated_data):
+        business_user = validated_data.get('business_user')
+        reviewer = self.context['request'].user
+
+        business_profile = UserProfile.objects.get(user=business_user)
+        reviewer_profile = UserProfile.objects.get(user=reviewer)
+
+        if business_profile.type == 'business' and reviewer_profile.type == 'customer':
+            review = Review.objects.create(
+                business_user = business_user,
+                reviewer = reviewer,
+                rating = validated_data.get('rating'),
+                description = validated_data.get('description')
+            )
+            return review
+        else:
+            raise serializers.ValidationError('Anbieter können nur von Kunden bewertet werden.')
