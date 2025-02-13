@@ -251,12 +251,22 @@ def completedOrderCount(request, business_user_id):
         return Response({'error': 'Business user not found.'}, status=status.HTTP_404_NOT_FOUND)
     
 
+class ReviewFilter(FilterSet):
+    business_user_id = NumberFilter(field_name='business_user')
+    reviewer_id = NumberFilter(field_name='reviewer')
+
+    class Meta:
+        model = Review
+        fields = ['business_user_id', 'reviewer_id']
+
+
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all().order_by('id')
     serializer_class = ReviewSerializer
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    ordering_fields = ['updated_at', 'rating']
     pagination_class = None
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    ordering_fields = ['updated_at', 'rating']
+    filterset_class = ReviewFilter
 
     """
     All authorized users can read reviews,
