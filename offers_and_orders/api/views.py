@@ -287,19 +287,19 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     """
-    Only the rating and comment can be patched. 
+    Only the rating and description can be patched. 
     """
     def partial_update(self, request, *args, **kwargs):
         review = self.get_object()
         new_rating = request.data.get('rating')
-        new_comment = request.data.get('comment')
-        if not new_rating and not new_comment:
+        new_description = request.data.get('description')
+        if not new_rating and not new_description:
             return Response(
                 {'detail': 'Fehlende neue Bewertung oder Beschreibung.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         review.rating = new_rating if new_rating else review.rating
-        review.comment = new_comment if new_comment else review.comment
+        review.description = new_description if new_description else review.description
         review.save()
         serializer = self.get_serializer(review)
         return Response(serializer.data, status=status.HTTP_200_OK)
