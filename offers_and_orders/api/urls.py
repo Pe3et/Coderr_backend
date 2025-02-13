@@ -13,6 +13,6 @@ router.register(r'reviews', ReviewViewSet, basename='reviews')
 urlpatterns = [
     path('', include(router.urls)),
     path('offerdetails/<int:pk>/', offerdetailsView, name='offerdetail-detail'),
-    path('order-count/<business_user_id>', openOrderCount, name='open-order-count'),
-    path('completed-order-count/<business_user_id>', completedOrderCount, name='completed-order-count')
+    path('order-count/<int:business_user_id>/', openOrderCount, name='open-order-count'),
+    path('completed-order-count/<int:business_user_id>/', completedOrderCount, name='completed-order-count')
 ]
