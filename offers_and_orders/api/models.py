@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from rest_framework.fields import MinValueValidator
+from rest_framework.fields import MaxValueValidator, MinValueValidator
 
 
 class Offer(models.Model):
@@ -62,3 +62,12 @@ class Order(models.Model):
 
     def __str__(self):
         return self.offer_detail.title
+    
+
+class Review(models.Model):
+    business_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviewed_business')
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviewing_customer')
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
