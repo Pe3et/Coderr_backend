@@ -16,6 +16,10 @@ The frontend part of the project can be found at: https://github.com/Pe3et/Coder
 ## Installation
 
 1.  Clone the repository using `git clone https://github.com/your-username/Coderr_backend.git`
-2.  Install dependencies using `pip install -r requirements.txt`
-3.  Start the server using `python manage.py runserver`
-4.  Start a localhost live-server for the frontend part and test the functionalities. 
+2.  Setup your own Django environment:
+        `python -m venv env`
+        `source env/bin/activate`
+        `pip install Django`
+3.  Install dependencies using `pip install -r requirements.txt`
+4.  Start the server using `python manage.py runserver`
+5.  Start a localhost live-server for the frontend part and test the functionalities. 
