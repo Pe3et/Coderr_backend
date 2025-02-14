@@ -142,7 +142,8 @@ class CustomerListView(generics.ListAPIView):
                     'last_name': user.last_name
                 },
                 'file': profile['file'],
-                'type': profile['type']
+                'type': profile['type'],
+                'uploaded_at': profile['uploaded_at']
             })
             
         return Response(response_data, status=status.HTTP_200_OK)

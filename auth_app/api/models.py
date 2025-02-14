@@ -14,4 +14,4 @@ class UserProfile(models.Model):
     description = models.TextField(blank=True, null=True)
     tel = models.CharField(max_length=20, blank=True, null=True)
     working_hours = models.CharField(max_length=15, blank=True, null=True)
-    
+    uploaded_at = models.DateTimeField(auto_now=True, null=True)
