@@ -6,7 +6,7 @@ from rest_framework.fields import MaxValueValidator, MinValueValidator
 class Offer(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    image = models.FileField(upload_to='offer_pictures', blank=True, null=True)
+    image = models.FileField(upload_to='offer_pictures', null=True, default=None)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='offers')
     min_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     min_delivery_time = models.IntegerField(null=True, blank=True)
