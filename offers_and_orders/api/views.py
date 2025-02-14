@@ -1,10 +1,12 @@
+from statistics import mean
 from django.contrib.auth.models import User
+from django.db.models import Avg
 from django_filters import FilterSet, NumberFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from django.urls import reverse
 from rest_framework import status, viewsets, filters
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from auth_app.api.models import UserProfile
@@ -303,3 +305,16 @@ class ReviewViewSet(viewsets.ModelViewSet):
         review.save()
         serializer = self.get_serializer(review)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def base_info_view(request):
+    response_data = {
+        'review_count': Review.objects.all().count(),
+        'average_rating': Review.objects.aggregate(Avg('rating'))['rating__avg'],
+        'business_profile_count': UserProfile.objects.filter(type='business').count(),
+        'offer_count': Offer.objects.all().count()
+    }
+
+    return Response(response_data, status=status.HTTP_200_OK)
