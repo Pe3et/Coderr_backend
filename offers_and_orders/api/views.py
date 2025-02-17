@@ -1,4 +1,3 @@
-from statistics import mean
 from django.contrib.auth.models import User
 from django.db.models import Avg
 from django_filters import FilterSet, NumberFilter
@@ -10,6 +9,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from auth_app.api.models import UserProfile
+from coderr import settings
 from offers_and_orders.api.models import Offer, OfferDetail, Order, Review
 from offers_and_orders.api.permissions import IsBusiness, IsBusinessAndOwnerOrAdmin, IsCustomer, IsSuperuser
 from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer, OrderSerializer, ReviewSerializer
@@ -111,21 +111,31 @@ class OfferViewSet(viewsets.ModelViewSet):
     """
     def partial_update(self, request, *args, **kwargs):
         offer_obj = self.get_object()
-        new_offer_detail_data = request.data['details'][0]
-        offer_type = new_offer_detail_data['offer_type']
-        offer_detail_obj = OfferDetail.objects.get(offer=offer_obj, offer_type=offer_type)
-        serializer = OfferDetailSerializer(offer_detail_obj, data=new_offer_detail_data, partial=True)
-        if serializer.is_valid():
-            offer_detail = serializer.save()
+        for new_offer_detail in request.data.pop('details', []):
+            offer_detail_obj = OfferDetail.objects.get(offer=offer_obj, offer_type=new_offer_detail['offer_type'])
+            detail_serializer = OfferDetailSerializer(offer_detail_obj, data=new_offer_detail, partial=True)
+            if not detail_serializer.is_valid():
+                return Response(detail_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            detail_serializer.save()
 
-            response_data = {
-                'id': offer_obj.id,
-                'title': offer_obj.title,
-                'details': OfferDetailSerializer(offer_detail).data
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-        else:
+        serializer = OfferSerializer(offer_obj, data=request.data, partial=True)
+        if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        response_data = self.get_update_response_data(offer_obj)
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    """
+    Returns the response data for a partial update.
+    """
+    def get_update_response_data(self, offer_obj):
+        return {
+            'id': offer_obj.id,
+            'title': offer_obj.title,
+            'description': offer_obj.description,
+            'image': f"{settings.MEDIA_URL}{offer_obj.image.name}" if offer_obj.image else None,
+            'details': list(offer_obj.details.values())
+        }
 
     """
     Handles custom delete logic.
