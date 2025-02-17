@@ -37,7 +37,9 @@ class OfferViewSet(viewsets.ModelViewSet):
     Only business users or superusers are allowed to change offers.
     """
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action == 'list':
+            permission_classes = [AllowAny]
+        elif self.action == 'retrieve':
             permission_classes = [IsAuthenticated]
         else:
             permission_classes = [IsBusinessAndOwnerOrAdmin]
