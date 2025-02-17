@@ -97,7 +97,6 @@ class SingleProfileView(APIView):
 class BusinessListView(generics.ListAPIView):
     queryset = UserProfile.objects.filter(type='business').order_by('user')
     serializer_class = UserProfileSerializer
-    permission_classes = [AllowAny]
 
     def list(self, request, *args, **kwargs):
         serializer = self.get_serializer(self.get_queryset(), many=True)
@@ -126,7 +125,6 @@ class BusinessListView(generics.ListAPIView):
 class CustomerListView(generics.ListAPIView):
     queryset = UserProfile.objects.filter(type='customer').order_by('user')
     serializer_class = UserProfileSerializer
-    permission_classes = [AllowAny]
 
     def list(self, request, *args, **kwargs):
         serializer = self.get_serializer(self.get_queryset(), many=True)
