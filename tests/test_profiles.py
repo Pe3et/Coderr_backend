@@ -111,13 +111,31 @@ class TestProfiles(APITestCase):
     """
     def test_business_list(self):
         url = reverse('business-list')
+        self.client.force_authenticate(user=self.user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200) 
 
     """
     Tests GET customer list.
     """
-    def test_business_list(self):
+    def test_customer_list(self):
         url = reverse('customer-list')
+        self.client.force_authenticate(user=self.user)
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200) 
+
+    """
+    Tests unauthorized GET business list.
+    """
+    def test_business_list(self):
+        url = reverse('business-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 401) 
+
+    """
+    Tests unauthorized GET customer list.
+    """
+    def test_customer_list(self):
+        url = reverse('customer-list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 401) 
