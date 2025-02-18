@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.urls import reverse
 from rest_framework import status, viewsets, filters
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
@@ -24,6 +25,10 @@ class OfferFilter(FilterSet):
         model = Offer
         fields = ['min_price', 'max_delivery_time', 'creator_id']
 
+class OfferPagination(LimitOffsetPagination):
+    default_limit = 6
+    max_limit = 100
+    limit_query_param = 'page_size'
 
 class OfferViewSet(viewsets.ModelViewSet):
     queryset = Offer.objects.all().order_by('id')
@@ -32,6 +37,7 @@ class OfferViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     ordering_fields = ['updated_at', 'min_price']
     search_fields = ['title', 'description']
+    pagination_class = OfferPagination
 
     """
     Only business users or superusers are allowed to change offers.
