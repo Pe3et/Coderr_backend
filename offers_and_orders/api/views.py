@@ -177,7 +177,9 @@ class OrderViewSet(viewsets.ModelViewSet):
     Only admins are allowed to delete orders.
     """
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action == 'retrieve':
+            permission_classes = [AllowAny]
+        elif self.action == 'list':
             permission_classes = [IsAuthenticated]
         elif self.action == 'create':
             permission_classes = [IsCustomer]
