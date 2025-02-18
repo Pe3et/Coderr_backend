@@ -14,6 +14,7 @@ from coderr import settings
 from offers_and_orders.api.models import Offer, OfferDetail, Order, Review
 from offers_and_orders.api.permissions import IsBusiness, IsBusinessAndOwnerOrAdmin, IsCustomer, IsSuperuser
 from offers_and_orders.api.serializers import OfferDetailSerializer, OfferSerializer, OrderSerializer, ReviewSerializer
+from offers_and_orders.utils.utility_functions import get_offer_details
 
 
 class OfferFilter(FilterSet):
@@ -140,7 +141,7 @@ class OfferViewSet(viewsets.ModelViewSet):
             'title': offer_obj.title,
             'description': offer_obj.description,
             'image': f"{settings.MEDIA_URL}{offer_obj.image.name}" if offer_obj.image else None,
-            'details': list(offer_obj.details.values())
+            'details': get_offer_details(offer_obj)
         }
 
     """
