@@ -38,7 +38,7 @@ class TestProfiles(APITestCase):
     def test_unauth_single_profile_get(self):
         url = reverse('profile-detail', kwargs={'pk':self.user.id})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
 
     """
     Tests if the authorized single GET functions properly.
@@ -77,7 +77,7 @@ class TestProfiles(APITestCase):
     def test_unauth_single_profile_patch(self):
         url = reverse('profile-detail', kwargs={'pk':self.user.id})
         response = self.client.patch(url, { 'first_name': 'test'})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 401)
         
     """
     Tests a bad single profile PATCH request.

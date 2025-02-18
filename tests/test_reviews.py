@@ -61,7 +61,7 @@ class TestReviews(APITestCase):
             'rating': 5
         }
         response = self.client.post(url, review_test_data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     """
     Tests bad review POST.
